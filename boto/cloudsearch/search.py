@@ -50,7 +50,7 @@ class SearchResults(object):
         self.match_expression = attrs['match-expr']
         self.query = attrs['query']
         self.search_service = attrs['search_service']
-
+        self.facets = attrs.get('facets',{})
         self.num_pages_needed = ceil(self.hits / self.query.real_size)
 
     def __len__(self):
