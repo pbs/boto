@@ -45,6 +45,14 @@ class Layer2(object):
         domain_data = self.layer1.describe_domains(domain_names)
         return [Domain(self.layer1, data) for data in domain_data]
 
+    def get_domain(self, domain_name):
+        """
+        Return a :class:`boto.cloudsearch.domain.Domain` object 
+        corresponding to domain_name. Returns None if domain_name
+        is not found.
+        """
+        return dict((x.name,x) for x in self.list_domains()).get(domain_name, None)
+
     def create_domain(self, domain_name):
         """
         Create a new CloudSearch domain and return the corresponding
