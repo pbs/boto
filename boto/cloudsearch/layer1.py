@@ -402,7 +402,7 @@ class Layer1(AWSQueryConnection):
         params = {}
         if domain_names is not None:
             for i, domain_name in enumerate(domain_names, 1):
-                params['DomainNames.members.%d' % (i,)] = domain_name
+                params['DomainNames.member.%d' % (i,)] = domain_name
         return self.get_response(doc_path, 'DescribeDomains',
                                  params, verb='POST',
                                  list_marker='DomainStatusList')
@@ -432,7 +432,7 @@ class Layer1(AWSQueryConnection):
         params = {'DomainName': domain_name}
         if field_names is not None:
             for i, field_name in enumerate(field_names, 1):
-                params['FieldNames.members.%d' % (i,)] = field_name
+                params['FieldNames.member.%d' % (i,)] = field_name
         return self.get_response(doc_path, 'DescribeIndexFields',
                                  params, verb='POST',
                                  list_marker='IndexFields')
@@ -462,7 +462,7 @@ class Layer1(AWSQueryConnection):
         params = {'DomainName': domain_name}
         if rank_names is not None:
             for i, rank_name in enumerate(rank_names, 1):
-                params['RankNames.members.%d' % (i,)] = rank_name
+                params['RankNames.member.%d' % (i,)] = rank_name
         return self.get_response(doc_path, 'DescribeRankExpressions',
                                  params, verb='POST',
                                  list_marker='RankExpressions')
