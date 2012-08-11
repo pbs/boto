@@ -27,17 +27,20 @@ import json
 import boto
 import requests
 
+from . import ( CloudsearchException,
+                CloudsearchProcessingException,
+                CloudsearchNeedsIndexingException)
 
-class SearchServiceException(Exception):
+class SearchServiceException(CloudsearchException):
     pass
 
 
-class CommitMismatchError(Exception):
+class CommitMismatchError(CloudsearchException):
     pass
 
 
 class SearchResults(object):
-    
+
     def __init__(self, **attrs):
         self.rid = attrs['info']['rid']
         # self.doc_coverage_pct = attrs['info']['doc-coverage-pct']
@@ -74,7 +77,7 @@ class SearchResults(object):
 
 
 class Query(object):
-    
+
     RESULTS_PER_PAGE = 500
 
     def __init__(self, q=None, bq=None, rank=None,
@@ -142,12 +145,33 @@ class Query(object):
 
 
 class SearchConnection(object):
-    
-    def __init__(self, domain=None, endpoint=None):
+
+    def __init__(self, domain=None, endpoint=None, connection=None, loose=True, needs_integrity=False):
+        """ A search connection. If loose, ignore processing exceptions. If needs_integrity is False, ignore NeedsIndexing exceptions
+
+            Defaults (loose=True, needs_integrity=False) reflect classic behavior. You probably should call this
+            with loose=False and needs_integrity=False unless you like cryptic exceptions and bad data.
+        """
         self.domain = domain
         self.endpoint = endpoint
+        self.connection = connection
+
+        if not loose or needs_integrity:
+            if self.domain is None and self.connection is None:
+                raise Exception('SearchConnection was requested with integrity or without loosness. This requires either a domain or a connection.')
         if not endpoint:
             self.endpoint = domain.search_service_endpoint
+        else:
+            if self.domain is None and not loose:
+                self.domain = connection.get_domain(
+                        '-'.join(itertools.takewhile(
+                            lambda x: '.' not in x, self.endpoint.split('-')[1:])))
+
+        if not loose and self.domain.processing:
+            raise CloudsearchProcessingException(self.domain.domain_name)
+
+        if needs_integrity and self.domain.needs_indexing:
+            raise CloudsearchNeedsIndexingException(self.domain.domain_name)
 
     def build_query(self, q=None, bq=None, rank=None, return_fields=None,
                     size=10, start=0, facet=None, facet_constraints=None,
