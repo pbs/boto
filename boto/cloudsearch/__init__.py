@@ -23,6 +23,14 @@
 #
 from boto.ec2.regioninfo import RegionInfo
 
+class CloudsearchException(Exception):
+    pass
+
+class CloudsearchProcessingException(CloudsearchException):
+    pass
+
+class CloudsearchNeedsIndexingException(CloudsearchException):
+    pass
 
 def regions():
     """
