@@ -170,7 +170,7 @@ class SearchConnection(object):
         if not loose and self.domain.processing:
             raise CloudsearchProcessingException(self.domain.domain_name)
 
-        if needs_integrity and self.domain.needs_indexing:
+        if needs_integrity and self.domain.requires_index_documents:
             raise CloudsearchNeedsIndexingException(self.domain.domain_name)
 
     def build_query(self, q=None, bq=None, rank=None, return_fields=None,
